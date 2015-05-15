@@ -1,0 +1,26 @@
+#!/bin/bash
+ver=$(git describe --tags)
+br=$(git branch | grep \*)
+br=$(echo ${br/* /})
+cov_dir=$(echo "analysis-${br}-${ver}")
+echo "Running Coverity on git branch ${br} version ${ver}"
+echo "Saving results in directory ${cov_dir}"
+read -p "Ok to proceed?(y/n)" response
+if [ $response = "y" ] 
+    then
+        cov-build --dir ${cov_dir} --config /home/user/myinstall/coverity/6.5.1/config/coverity_linaro_config.xml make clean release arm DEVICE=C66AK2Hxx
+        cov-analyze --all --dir ${cov_dir}/ --aggressiveness-level medium
+fi
+if [ $response != "y" ] 
+    then
+        echo "Done" 
+        exit
+fi
+
+
+read -p "Commit defects to coverity?(y/n)" response
+if [ $response == "y" ] 
+    then
+        echo "commit defects from ${cov_dir} to OpenCL with description: dsptop-${ver}"
+        cov-commit-defects --host coverity.gt.design.ti.com --port 8081 --user a0343404 --password a0343404 --dir ${cov_dir} --stream OpenCl --description dsptop-${ver}
+fi

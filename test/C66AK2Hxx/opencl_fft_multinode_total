@@ -1,0 +1,29 @@
+#==============================================================================
+# Test configuration file for the openmpi+opencl multinode fft example
+#==============================================================================
+name:run_multinode_batch_fft.sh
+path:/usr/share/ti/examples/openmpi+opencl/multinode_batch_fftdemo/scripts
+#==============================================================================
+# dsptop options
+#==============================================================================
+sample_window:0
+delay:.5
+#==============================================================================
+# Expected values and threshold for memory
+# ext mem code total, % used, ext mem data, % used, int mem data, % used
+#==============================================================================
+mem_exp:376832,2.4,6291456,0,4864,0
+mem_thresh:0,0,0,0,0,0
+#==============================================================================
+# Expected values and thresholds for run and idle times
+#==============================================================================
+dsp 0 run_time 0.100 idle_time 0.010
+dsp 1 run_time 0.005 idle_time 0.085
+dsp 2 run_time 0.005 idle_time 0.085
+dsp 3 run_time 0.005 idle_time 0.085
+dsp 4 run_time 0.005 idle_time 0.085
+dsp 5 run_time 0.005 idle_time 0.085
+dsp 6 run_time 0.005 idle_time 0.085
+dsp 7 run_time 0.005 idle_time 0.085
+runtime_threshold:0.05
+idletime_threshold:0.05

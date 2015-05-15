@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [ "$#" -lt "1" ]; then
+    echo "Usage: dsptop_sync cmd [options]"
+    echo "       dsptop_sync will start dsptop, wait until dsptop has configured"
+    echo "       the session based on .dsptoprc file, execute the cmd, and then"
+    echo "       terminate dsptop."
+    exit
+fi
+
+#remove the pipe if it exists
+pipe=./.dsptop_fifo
+rm -f $pipe
+
+# Start the server
+dsptop --sync &
+
+# Wait for dsptop to create the pipe
+while true
+do 
+    if [[ -p $pipe ]]; then
+        break
+    fi
+done
+
+# Wait for dsptop to write it's pid to the pipe 
+while true
+do
+    if read line <$pipe; then
+        break;
+    fi
+done
+
+# Execute the argument
+echo "execute:$@"
+eval $@
+
+kill -INT $line
+rm -f $pipe
+echo "dsptop_sync exiting"

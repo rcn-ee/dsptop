@@ -1,0 +1,29 @@
+#==============================================================================
+# Test configuration file for the opencl+openmp vecadd example
+#==============================================================================
+name:vecadd_openmp
+path:/usr/share/ti/examples/opencl+openmp/vecadd_openmp
+#==============================================================================
+# dsptop options
+#==============================================================================
+sample_window:.5
+delay:.5
+#==============================================================================
+# Expected values and threshold for memory
+# ext mem code total, % used, ext mem data, % used, int mem data, % used
+#==============================================================================
+mem_exp:376832,.1,6291456,0,4864,0
+mem_thresh:0,0,0,0,0,0
+#==============================================================================
+# Expected values and thresholds for run and idle times
+#==============================================================================
+dsp 0 run_time 0.000379 idle_time 0.0013
+dsp 1 run_time 0.000016 idle_time 0.0016
+dsp 2 run_time 0.000016 idle_time 0.0016
+dsp 3 run_time 0.000016 idle_time 0.0016
+dsp 4 run_time 0.000016 idle_time 0.0016
+dsp 5 run_time 0.000016 idle_time 0.0016
+dsp 6 run_time 0.000016 idle_time 0.0016
+dsp 7 run_time 0.000016 idle_time 0.0016
+runtime_threshold:0.002
+idletime_threshold:0.002

@@ -1,0 +1,83 @@
+.TH DSPTOP 1 "Last update September 23,2014" Linux "Texas Instruments \(hy dsptop Users Manual"
+.SH NAME 
+dsptop
+.SH SYNOPSIS 
+.B dsptop 
+[\-h|\-\-help] [\-d|\-\-delay=<seconds.tenths>] [\-l|\-\-logging=<first|last>] [\-m|\-\-maxoutfile=<value>] [\-n \-\-number=<value>] [\-o|\-\-output=<filename>] [\-p|\-\-process] [\-q|\-\-quiet] [\-s|\-\-sample=<seconds.tenths>] [\-r|\-\-resolution=<seconds.milliseconds> [\-y|\-\-sync] [\-v|\-\-version]
+
+.SH DESCRIPTION 
+.B dsptop 
+provides two functions for OpenCL and OpenMP, a DSP usage monitor (similar to Linux top utility) and DSP usage message logging. OpenCL and OpenMP generate usage messages that are used by dsptop. The DSP usage monitor can be operated in one of two modes, Moving Average Mode or Total Mode. 
+
+When in Moving Average Mode or Total Mode the display is divided into two sections. Data above the interactive command line shows DSP and memory usage aggregated across all DSPs. Device temperature will also be shown if available. Data bellow the interactive command line is per DSP. Usage messages are captured in a system level circular trace buffer. While in either Moving Average Mode or Total Mode the trace buffer is sampled. The Accuracy display shows what percentage of time dsptop can not collect data because it's reading the trace buffer (this value can change depending on how busy the system is). 
+
+In Logging mode (see \-l) DSP usage messages are collected in the system level trace buffer until dsptop is terminated (the trace buffer is not sampled). The trace buffer can wrap (see \-l). While in logging mode dsptop can also run quiet (see \-q).
+
+The default (no .dsptoprc file found) is to run in Moving Average Mode with a 3 second sample window. Command line options are used to select the initial operating parameters. Options are first read from the .dsptoprc file in the current directory and then from the command line. Some parameters may also be modified interactively (see the 
+.B INTERACTIVE COMMANDS
+section).  
+
+.SH COMMAND LINE OPTIONS 
+.IP "\-h \-\-help"
+Provides brief explanation of each option.
+.IP "\-d \-\-delay=<seconds.tenths>"
+Specifies the delay between screen updates. The default is 3 seconds. The delay parameter can be changed with the 'd' interactive command. Minimum is .5 seconds, Maximum is 900 seconds. 
+.IP "\-f \-\-format=<text|csv|gnuplot|gnuplot_wxt>"
+Set the out file format, default is text. A file extension (.txt, .csv, .gp_cmd & .gp_dat) will be appended to the filename provided with \-\-output. Selecting gnuplot_wxt will also launch gnuplot (if installed) with a wxt terminal when you exit dsptop, or if \-\-process is selected when the current DSP process completes execution. 
+.IP "\-l \-\-logging=<first|last>"   
+Change dsptop's operating mode to DSP usage message logging. Selecting "first" will write the DSP messages captured in the trace buffer to stdout once the trace buffer fills, and terminate dsptop thus providing the first messages captured. Selecting "last" will allow the trace buffer to operate as a circular buffer in which case the last DSP usage messages are written to stdout when dsptop exits. 
+
+When logging, DSP usage is not displayed. Only the elapsed time, mode line and trace buffer percentage full are displayed, unless the \-\-quiet option is selected in which case nothing is displayed (and interactive mode is disabled).
+
+If an output file is selected with \-o, DSP messages are written to the selected file rather than stdout. On a CNTL\(hyC or interactive quit (q) command (if not in quiet mode), DSP message capture is terminated, the data written to stdout or a file and dsptop terminated. The log file will not exceed the size set by \-m. Also see dsptop_sync script operation.
+
+Note that \-f will have no effect if logging (\-l).
+
+.IP "\-m \-\-maxoutfile=<value>"
+Set the maximum size of the out file in bytes.
+.IP "\-n \-\-number=<value>"
+Set the number of screen update iterations (\-d) after which dsptop is terminated. \-n can be used in any mode.
+.IP "\-o \-\-output=<filename>"
+Change the default output from stdout to a file. If not logging (\-\-logging) and a \-\-output file is defined, the usage percentage, run time, idle time and device temperature are sampled and saved to the file in the format defined by \-\-format. In the case of gnuplot only usage percentage and device temperature are saved to the file. Sample resolution may be modified with \-\-resolution. While data is being collected, if the interactive Clear command (c) is executed, the Moving Average Sample window (s) is changed, or the usage sampling resolution (r) is changed, data sampling starts over and the data collected previously is discarded. 
+.IP "\-p \-\-process" 
+Switch from continuous DSP run/idle time accumulation to single DSP process run/idle time accumulation. Will stop advancing usage run and idle time on exit of the current DSP process and resume (with run/idle time reset to 0) when the next process starts. If \-\-process is selected and usage data is being collected to a file (\-\-output filename), the file will contain only the data for the last DSP process. If \-\-format gnuplot_wxt is selected, both the output file (filename.gp_dat) and the gnuplot display will be updated when the current process terminates.
+.IP "\-q \-\-quiet"
+If in Logging Mode only usage messages are exported to stdout (see \-l for more details).
+.IP "\-r \-\-resolution=<value>"
+Set the resolution for usage samples between .001 and 1 second. The default is .1 seconds.
+.IP "\-s \-\-sample=<seconds.tenths>"
+Specify the sample widow for the moving average (how far back in time usage is displayed for). The default is 3 seconds. Minimum is .5 seconds, Maximum is 900 seconds. Setting the sample window to 0 will change the mode from Moving Average to Total. In Total mode the usage is display over the total elapsed time dsptop is running. The sample parameter can be changed with the 's' interactive command.
+.IP "\-S \-\-stop"
+Stop logging when the trace buffer fills, thus providing the first messages captured. The default is to allow the trace buffer to wrap, thus providing the last messages captured. This option causes dsptop to automatically write the log file and terminate when the trace buffer fills.  
+.IP "\-y \-\-sync"
+Sync mode. Sync mode causes dsptop to write it's pid to a named pipe (.dsptop_fifo) once dsptop is ready to collect DSP usage data, thus a script can be used as a means to synchronize dsptop with the eval of other commands. See DSPTOP_SYNC SCRIPT section below for more details.
+.IP "\-V, \-\-version"
+Provides the version of this utility and the server if connected to a remote receiver.
+
+.SH INTERACTIVE COMMANDS
+.IP "d" 
+Set the screen refresh rate in seconds.tenths.
+.IP "h"
+Interactive Help: Show brief description of interactive commands, current option settings, and ARM/DSP clock rates.  
+.IP "q"
+Quit dsptop. If in Logging Mode the logging data collected is written to either stdout or a file (if \-o used) prior to termination. CNTL\(hyC provides the same functionality.
+.IP "r"
+Change the usage sampling resolution (seconds.milliseconds).
+.IP "s"
+Set the Moving Average Mode sample window (seconds.tenths), Setting to 0 causes mode to change to Total Mode.
+.IP "c"
+Clear the current usage and start over. Only works for Moving Average Mode or Total Mode.
+.IP "w"
+Write the current options to the .dsptoprc file.
+
+.SH DSPTOP_SYNC SCRIPT
+The dsptop_sync bash script is also provided to allow dsptop to be synchronized with the execution of a specific Linux command. Usage is:
+
+dsptop_sync command [command options]
+
+The script runs dsptop in sync mode (\-\-sync) in the background and does not start execution of the command until dsptop is ready to collect usage data. When execution of the "command" is complete, dsptop_sync terminates dsptop. The .dsptoprc file should be used to select operating parameters for dsptop's execution (such as \-l last, \-q and \-o filename if logging).
+
+.SH SUPPORT
+See 
+.B http://processors.wiki.ti.com/index.php/Dsptop
+for additional dsptop information and examples. For support see the TI E2E Forum.
