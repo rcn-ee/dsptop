@@ -18,16 +18,16 @@
 obj-m := temperature_kmodule.o
 
 KVERSION ?= $(shell uname -r)
-KDIR  ?= /lib/modules/$(KVERSION)/build
+KERNEL_SRC  ?= /lib/modules/$(KVERSION)/build
 
 default all:
-	make -C $(KDIR) M=$(PWD) modules 
+	make -C $(KERNEL_SRC) M=$(PWD) modules 
 
 clean:
-	make -C $(KDIR) M=$(PWD) clean
+	make -C $(KERNEL_SRC) M=$(PWD) clean
 
-install: 
-	make -C $(KDIR) M=$(PWD) modules_install
+modules_install: 
+	make -C $(KERNEL_SRC) M=$(PWD) modules_install
 
 install_ipk: default all
 	install -m 644 -d $(DESTDIR)/lib/modules/$(KVERSION)/extra

@@ -1,3 +1,9 @@
+temperature-mod-dkms (1.0.1-0ubuntu2~ppa2) trusty; urgency=medium
+
+  * Update Makefile to be Yocto compatible.
+
+ -- TI Keystone PPA <ti-keystone-ppa@list.ti.com>  Thu, 09 Jul 2015 07:38:00 -0500
+
 temperature-mod-dkms (1.0.1-0ubuntu2~ppa1) trusty; urgency=medium
 
   * Update debian/copyright to GPLv2 and remove invalid source pointer.
