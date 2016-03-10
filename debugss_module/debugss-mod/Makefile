@@ -16,7 +16,7 @@
 #
 
 obj-m := debugss_kmodule.o
-CFLAGS_debugss_kmodule.o := -D $(PLATFORM)
+CFLAGS_debugss_kmodule.o := -D$(PLATFORM)
 
 KVERSION ?= $(shell uname -r)
 KERNEL_SRC  ?= /lib/modules/$(KVERSION)/build

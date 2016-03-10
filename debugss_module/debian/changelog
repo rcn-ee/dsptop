@@ -1,3 +1,9 @@
+debugss-mod-dkms (1.0.1-0ubuntu0~ppa6) trusty; urgency=medium
+
+  * Allow build for devices with no debugss armpll in device tree.
+
+ -- TI Keystone PPA <ti-keystone-ppa@list.ti.com>  Thu, 10 Mar 2016 15:37:03 -0600
+
 debugss-mod-dkms (1.0.1-0ubuntu0~ppa5) trusty; urgency=medium
 
   * Remove version suffix from debian/install.

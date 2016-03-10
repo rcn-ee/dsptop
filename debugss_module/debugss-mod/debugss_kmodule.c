@@ -44,7 +44,9 @@ static ekeystone_device_type target_device_type;
 /* Device driver static variables */
 static struct device* debugss_device = NULL;
 static struct clk		*mainpll_clk;
+#ifndef NO_DEBUGSS_ARM_PLL
 static struct clk		*armpll_clk;
+#endif
 static struct clk		*gemtrace_clk;
 static struct clk		*debugss_clk;
 static struct clk		*tetb_clk;
@@ -147,18 +149,17 @@ static int check_valid_debugss_addr_range(uint32_t range_start_addr,
 
 #ifdef KEYSTONE_PLATFORM
 
-        if(e66AK2Hxx_device == target_device_type) {
-                for(idx=0; idx<eK2H_DEBUGSS_NUM_RANGE_MAX; idx++) {
-                        if((range_start_addr >= k2h_debugss_addr_range[idx][0]) 
-                       && (range_end_addr <= k2h_debugss_addr_range[idx][1])) {
-                                /* valid debugss address range */                                
-                                return(1);
-                        }
-                }
 
-                if(eK2H_DEBUGSS_NUM_RANGE_MAX == idx){
-                        return(-1); /* unvalid debugss address range */
-                }
+		for(idx=0; idx<eK2H_DEBUGSS_NUM_RANGE_MAX; idx++) {
+			if((range_start_addr >= k2h_debugss_addr_range[idx][0]) 
+				&& (range_end_addr <= k2h_debugss_addr_range[idx][1])) {
+					/* valid debugss address range */ 
+					return(1);
+            }
+        }
+
+        if(eK2H_DEBUGSS_NUM_RANGE_MAX == idx){
+                return(-1); /* unvalid debugss address range */
         }
 
 #endif
@@ -521,6 +522,7 @@ static ssize_t get_mainpllclk(struct device* dev,
 	return byte_count;
 }
 
+#ifndef NO_DEBUGSS_ARM_PLL
 static ssize_t get_armpllclk(struct device* dev, 
 				struct device_attribute* attr, 
 				char* buf)
@@ -537,6 +539,7 @@ static ssize_t get_armpllclk(struct device* dev,
 
 	return byte_count;
 }
+#endif
 
 static ssize_t get_debugssclk(struct device* dev, 
 			      struct device_attribute* attr, 
@@ -595,7 +598,9 @@ dev_attr_device_name, dev_attr_mainpllclk, dev_attr_armpllclk
 dev_attr_debugssclk and dev_attr_gemtraceclk */
 static DEVICE_ATTR(device_name, S_IRUGO, show_device_name, NULL);
 static DEVICE_ATTR(mainpllclk, S_IRUGO, get_mainpllclk, NULL);
+#ifndef NO_DEBUGSS_ARM_PLL
 static DEVICE_ATTR(armpllclk, S_IRUGO, get_armpllclk, NULL);
+#endif
 static DEVICE_ATTR(debugssclk, S_IRUGO, get_debugssclk, NULL);
 static DEVICE_ATTR(gemtraceclk, S_IRUGO, get_gemtraceclk, NULL);
 static DEVICE_ATTR(tetbclk, S_IRUGO, get_tetbclk, NULL);
@@ -619,12 +624,14 @@ static int keystone_debugss_probe(struct platform_device *pdev)
 
 	clk_prepare_enable(mainpll_clk);
 
+#ifndef NO_DEBUGSS_ARM_PLL
 	/* Prepare armpll clock */
 	armpll_clk = devm_clk_get(debugss_device, "armpllclock");
 	if (WARN_ON(IS_ERR(armpll_clk)))
 		return PTR_ERR(armpll_clk);
 
 	clk_prepare_enable(armpll_clk);
+#endif
 
 	/* Prepare gemtrace clock */
 	gemtrace_clk = devm_clk_get(debugss_device, "gemtraceclock");
@@ -767,10 +774,12 @@ static int keystone_debugss_probe(struct platform_device *pdev)
 	if (retval < 0) {
 		__E("failed to create debugss mainpllclk /sys endpoint\n");
 	}
+#ifndef NO_DEBUGSS_ARM_PLL
 	retval = device_create_file(debugss_device, &dev_attr_armpllclk);
 	if (retval < 0) {
 		__E("failed to create debugss armpllclk /sys endpoint\n");
 	}
+#endif
 	retval = device_create_file(debugss_device, &dev_attr_debugssclk);
 	if (retval < 0) {
 	__E("failed to create debugss debugssclk /sys endpoint\n");
@@ -793,7 +802,9 @@ static int keystone_debugss_remove(struct platform_device *pdev)
 
 	device_remove_file(debugss_device, &dev_attr_device_name);
 	device_remove_file(debugss_device, &dev_attr_mainpllclk);
+#ifndef NO_DEBUGSS_ARM_PLL
 	device_remove_file(debugss_device, &dev_attr_armpllclk);
+#endif
 	device_remove_file(debugss_device, &dev_attr_debugssclk);
 	device_remove_file(debugss_device, &dev_attr_gemtraceclk);
 	device_remove_file(debugss_device, &dev_attr_tetbclk);
@@ -804,8 +815,10 @@ static int keystone_debugss_remove(struct platform_device *pdev)
 	/* Un-prepare mainpll clock */
 	clk_disable_unprepare(mainpll_clk);
 
+#ifndef NO_DEBUGSS_ARM_PLL
 	/* Un-prepare armpll clock */
 	//clk_disable_unprepare(armpll_clk);
+#endif
 
 	/* Un-prepare gemtrace clock */
 	clk_disable_unprepare(gemtrace_clk);

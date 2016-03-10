@@ -11,10 +11,15 @@
 
 #define DRIVER_NAME "debugss_module_drv"
 
+#ifdef K2E_PLATFORM
+#define KEYSTONE_PLATFORM
+#define NO_DEBUGSS_ARM_PLL
+#endif
+
 #ifdef KEYSTONE_PLATFORM
 
 #define DEBUGSS_KM_MAJOR_VERSION 1
-#define DEBUGSS_KM_MINOR_VERSION 1
+#define DEBUGSS_KM_MINOR_VERSION 2
 #define DEBUGSS_KM_PATCH_VERSION 0
 
 /* enum defining indexes for all the valid debugss address ranges */
