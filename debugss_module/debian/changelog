@@ -1,3 +1,9 @@
+debugss-mod-dkms (1.3.0-0ubuntu0~ppa0) trusty; urgency=medium
+
+  * Enabled debugss for AM5728 PG2.0. 
+
+ --  TI Keystone PPA <ti-keystone-ppa@list.ti.com> Mon, 14 Mar 2016 12:37:32 -0500
+
 debugss-mod-dkms (1.0.1-0ubuntu0~ppa6) trusty; urgency=medium
 
   * Allow build for devices with no debugss armpll in device tree.

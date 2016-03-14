@@ -19,7 +19,7 @@
 #ifdef KEYSTONE_PLATFORM
 
 #define DEBUGSS_KM_MAJOR_VERSION 1
-#define DEBUGSS_KM_MINOR_VERSION 2
+#define DEBUGSS_KM_MINOR_VERSION 3
 #define DEBUGSS_KM_PATCH_VERSION 0
 
 /* enum defining indexes for all the valid debugss address ranges */
@@ -128,7 +128,8 @@ static unsigned int dra7xx_debugss_addr_range[eDRA7xx_DEBUGSS_NUM_RANGE_MAX][2] 
 #define AM5726E_BASE_PN		(58)
 #define AM5728_BASE_PN		(59)
 #define AM5728E_BASE_PN		(60)
-#define OMAP572x_BASE_PN        (63)
+#define AM5728_3E_BASE_PN	(62)
+#define OMAP572x_BASE_PN    (63)
 
 //AM571x ID_CODE-RAMP_SYSTEM value
 #define AM571x_RAMP_SYSTEM      (0xB9BC)

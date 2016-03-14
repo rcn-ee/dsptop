@@ -126,7 +126,7 @@ static edra7xx_device_type identify_dra7xx_device(uint32_t die_id_2, uint32_t id
 		} else if((DRA750_BASE_PN == base_pn) || (DRA751_BASE_PN == base_pn) || (DRA752_BASE_PN == base_pn) || (DRA754_BASE_PN == base_pn) 
 		           || (DRA755_BASE_PN == base_pn) || (DRA756_BASE_PN == base_pn)) {
 		        return(eDRA75xx_device);
-		} else if((AM5726_BASE_PN == base_pn) || (AM5726E_BASE_PN == base_pn) || (AM5728_BASE_PN == base_pn) || (AM5728E_BASE_PN == base_pn)) {
+		} else if((AM5726_BASE_PN == base_pn) || (AM5726E_BASE_PN == base_pn) || (AM5728_BASE_PN == base_pn) || (AM5728E_BASE_PN == base_pn) || (AM5728_3E_BASE_PN == base_pn)) {
 		        return(eAM572x_device);
 		}else if(OMAP572x_BASE_PN == base_pn) {
 		        return(eAM572x_device); //return OMAP572x as AM572x
