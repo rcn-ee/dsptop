@@ -267,6 +267,12 @@ long util_get_freq(clock_type_t clk_type)
         err_handler(ERR_TYPE_SYSTEM, ERR_DBGSS_SYSFILE, NULL);   
     }
 
+#if defined(DRA7xx)
+    /* In case debugss fails to write STM frequency to the filesystem,       */
+    /* use this value.  If debugss is fixed, the value here is not used.     */
+    if (clk_type == DEBUGSS_STM_CLK && value == 0)  value = 188000000;
+#endif
+
     LOGMSG("%s: %s is %d Hz", __func__, device_table[i].filename_p[clk_type], value);
 
     clock_values[clk_type] = value;

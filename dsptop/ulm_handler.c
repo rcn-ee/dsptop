@@ -702,9 +702,9 @@ void ulm_decode_usage()
         LOGMSG("%s: mva test mode - adjust arm master ids a DSP id", __func__);
         int new_master_id = 0;
         for ( int i = 0; i < ulm_msg_cnt; i++) {
-#ifdef C66AK2Hxx
+#if defined(C66AK2Hxx)
             if (ulm_msg_p[i].master_id >= 8) {
-#elif DRA7xx
+#elif defined(DRA7xx)
             if ((ulm_msg_p[i].master_id == 0) || (ulm_msg_p[i].master_id == 1)) {
 #else
             #error "Invalid DEVICE type"

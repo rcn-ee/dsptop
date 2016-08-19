@@ -104,7 +104,8 @@ static char * fmt_table[] = {
     [FMT_TEXT] = "text",
     [FMT_CSV] = "csv",
     [FMT_GNUPLOT] = "gnuplot",
-    [FMT_GNUPLOT_WXT] = "gnuplot_wxt"
+    [FMT_GNUPLOT_WXT] = "gnuplot_wxt",
+    [FMT_FIFO] = "fifo"
 }; 
 
 /* Logging argument values */
@@ -174,11 +175,12 @@ void parse_args (int argc, char * const argv[], options_t * opt_p)
             fprintf(g_stdout, "\nUsage: %s [dhlmnpqrsSvy]\n", g_whoami);
             fprintf(g_stdout, "See \"man dsptop\" for more details.\n");
             fprintf(g_stdout, " --delay/-d <value>              Set the screen refresh rate in seconds (fractional seconds ok).\n");
-            fprintf(g_stdout, " --format/-f <text|csv|gnuplot|gnuplot_wxt> \n");
+            fprintf(g_stdout, " --format/-f <text|csv|gnuplot|gnuplot_wxt|fifo> \n");
             fprintf(g_stdout, "                                 Set the --output file format for DSP usage data, default is text.\n");
             fprintf(g_stdout, "                                 A file extension (.txt, .csv, .gp_cmd & .gp_dat) will be appended\n");
-            fprintf(g_stdout, "                                 to the filename selected with --output. Selecting gnuplot_wxt will\n");
-            fprintf(g_stdout, "                                 also launch gnuplot with a wxt terminal to plot DSP usage data.\n");
+            fprintf(g_stdout, "                                 to the filename selected with --output, except fifo format. \n");
+            fprintf(g_stdout, "                                 Selecting gnuplot_wxt will also launch gnuplot with a wxt\n");
+            fprintf(g_stdout, "                                 terminal to plot DSP usage data.\n");
             fprintf(g_stdout, " --help/-h                       Display help.\n");
             fprintf(g_stdout, " --logging/-l <first|last>       Enable DSP message logging to stdout. DSP messages are captured in a\n");
             fprintf(g_stdout, "                                 circular buffer. Selecting \"first\" will write the DSP messages from\n");
@@ -199,6 +201,11 @@ void parse_args (int argc, char * const argv[], options_t * opt_p)
             fprintf(g_stdout, " --sync/-y                       Enable sync (used by dsptop_sync script).\n");
             fprintf(g_stdout, " --version/-v                    Display version.\n");
             fprintf(g_stdout, "\n                                 Ask a question or report a problem at e2e.ti.com.\n");
+            fprintf(g_stdout, "\n                                 NOTE: on AM57x by default, Linux will suspend and resume DSPs\n");
+            fprintf(g_stdout, "\n                                 automatically based on the load.  dsptop will disable automatic\n");
+            fprintf(g_stdout, "\n                                 DSP suspend/resume when it starts, and re-enable automatic DSP\n");
+            fprintf(g_stdout, "\n                                 suspend/resume when it exits.  Use -n option to prevent dsptop\n");
+            fprintf(g_stdout, "\n                                 from running indefinitely.\n");
             fprintf(g_stdout, "\n");
             exit(0);
         case 'l':

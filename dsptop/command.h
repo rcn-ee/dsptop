@@ -47,6 +47,7 @@ typedef enum {
     FMT_CSV,
     FMT_GNUPLOT,
     FMT_GNUPLOT_WXT,
+    FMT_FIFO,
     FMT_LAST
 } format_type_t;
 

@@ -22,8 +22,8 @@ section).
 Provides brief explanation of each option.
 .IP "\-d \-\-delay=<seconds.tenths>"
 Specifies the delay between screen updates. The default is 3 seconds. The delay parameter can be changed with the 'd' interactive command. Minimum is .5 seconds, Maximum is 900 seconds. 
-.IP "\-f \-\-format=<text|csv|gnuplot|gnuplot_wxt>"
-Set the out file format, default is text. A file extension (.txt, .csv, .gp_cmd & .gp_dat) will be appended to the filename provided with \-\-output. Selecting gnuplot_wxt will also launch gnuplot (if installed) with a wxt terminal when you exit dsptop, or if \-\-process is selected when the current DSP process completes execution. 
+.IP "\-f \-\-format=<text|csv|gnuplot|gnuplot_wxt|fifo>"
+Set the out file format, default is text. A file extension (.txt, .csv, .gp_cmd & .gp_dat) will be appended to the filename provided with \-\-output. Selecting gnuplot_wxt will also launch gnuplot (if installed) with a wxt terminal when you exit dsptop, or if \-\-process is selected when the current DSP process completes execution. No file extension will be added to fifo name specified with \-\-output.
 .IP "\-l \-\-logging=<first|last>"   
 Change dsptop's operating mode to DSP usage message logging. Selecting "first" will write the DSP messages captured in the trace buffer to stdout once the trace buffer fills, and terminate dsptop thus providing the first messages captured. Selecting "last" will allow the trace buffer to operate as a circular buffer in which case the last DSP usage messages are written to stdout when dsptop exits. 
 
@@ -81,3 +81,7 @@ The script runs dsptop in sync mode (\-\-sync) in the background and does not st
 See 
 .B http://processors.wiki.ti.com/index.php/Dsptop
 for additional dsptop information and examples. For support see the TI E2E Forum.
+
+.SH NOTE
+On AM57x by default, Linux will suspend and resume DSPs automatically based on the load.  dsptop will disable automatic DSP suspend/resume when it starts, and re-enable automatic DSP suspend/resume when it exits.  Use -n option to prevent dsptop from running indefinitely.
+

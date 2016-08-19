@@ -74,6 +74,7 @@ static FILE * cmd_fp = NULL;
 static FILE * tmp_plot_fp = NULL;
 static uint32_t plot_maxfilesize = 0;
 static int plot_num_dsps = 0;
+static int plot_fifo_fd = -1;
 
 static const char * tmp_filename_p = "/tmp/dsptop_plot.gnuplot";
 
@@ -182,6 +183,7 @@ void plot_init(options_t * options_p, dsp_type_t * dsp_info_p)
         }
         case FMT_TEXT:
         case FMT_CSV:
+        case FMT_FIFO:
         default:
             break; /* Nothing to initialize */
     }
@@ -223,7 +225,7 @@ void plot_write_current(int dsp_index, double timestamp, double runtime, double 
         return;
     }
 
-    if (plot_fp == NULL) {
+    if (plot_fp == NULL && plot_fifo_fd == -1) {
         err_handler(ERR_TYPE_LOCAL, ERR_DEBUG, NULL);
     }
 
@@ -240,6 +242,9 @@ void plot_write_current(int dsp_index, double timestamp, double runtime, double 
         case FMT_CSV:
             format_p = (temp == -128) ? "%4.3f,%d,%3.2f,%6.6f,%6.6f\n" : "%4.3f,%d,%3.2f,%6.6f,%6.6f,%d\n";
             break;
+        case FMT_FIFO:
+            format_p = "CPULOAD: DSP%d %d\n";
+            break;
         default:
             err_handler(ERR_TYPE_LOCAL, ERR_DEBUG, NULL);
     }
@@ -247,6 +252,12 @@ void plot_write_current(int dsp_index, double timestamp, double runtime, double 
     /* Form the message in msg_buf */
     size_t chr_cnt = 0;
     double usage = (runtime == 0) ? 0 : (runtime/(runtime + idletime)) * 100.0;
+
+    if (plot_format == FMT_FIFO) {
+        chr_cnt = snprintf(msg_buf, maxfile_record_size, format_p, dsp_index+1, (int) usage);
+        write(plot_fifo_fd, msg_buf, chr_cnt);
+        return;
+    }
 
     chr_cnt += snprintf(msg_buf + chr_cnt, maxfile_record_size - chr_cnt, format_p, timestamp, dsp_index, usage, runtime, idletime, temp);
     if (maxfile_record_size - chr_cnt < 1) {
@@ -306,15 +317,25 @@ void plot_start()
             break;
         case FMT_TEXT:
             break;
+        case FMT_FIFO:
+            file_ext = "";
+            break;
         default:
             err_handler(ERR_TYPE_LOCAL, ERR_DEBUG, NULL);
     }
 
     /* Open the data file */
+    /* Note: the FIFO format writes to a FIFO instead of a regular file, the */
+    /*       FIFO output format is: "CPULOAD DSP# usage_percentage", the     */
+    /*       expected consumer of FIFO is soc-performance-monitor tool.      */
     util_gen_filename(datafile_name_p, PATH_MAX, plot_filename_p, file_ext);
 
-    plot_fp = fopen(datafile_name_p, "w");
-    if (plot_fp == NULL) {
+    if (plot_format != FMT_FIFO)
+        plot_fp = fopen(datafile_name_p, "w");
+    else
+        plot_fifo_fd = open(datafile_name_p, O_WRONLY | O_NONBLOCK);
+
+    if (plot_fp == NULL && plot_fifo_fd == -1) {
         char * msg = "Can not open out file for writing";
         LOGMSG("%s:%s: %s", __func__, msg, datafile_name_p);
         err_handler(ERR_TYPE_SYSTEM, ERR_FATAL, msg);
@@ -346,6 +367,16 @@ void plot_start()
             fprintf(plot_fp, format_p);
             break;
         }
+        case FMT_FIFO:
+        {
+            char msg_buf[32];
+            for (int i = 0; i < plot_num_dsps; i++)
+            {
+                int chr_cnt = snprintf(msg_buf, 32, "CPULOAD: DSP%d 0\n", i+1);
+                write(plot_fifo_fd, msg_buf, chr_cnt);
+            }
+            break;
+        }
         default:
             err_handler(ERR_TYPE_LOCAL, ERR_DEBUG, NULL);
     }
@@ -373,6 +404,7 @@ void plot_launch()
         case FMT_TEXT: 
         case FMT_CSV:
         case FMT_GNUPLOT:
+        case FMT_FIFO:
         default:
             break; /* Nothing to launch */
     }
@@ -396,6 +428,9 @@ void plot_postprocess()
         case FMT_GNUPLOT_WXT:
         case FMT_GNUPLOT:
             plot_postprocess_gnuplot();
+            break;
+        case FMT_FIFO:
+            if (plot_fifo_fd != -1)  close(plot_fifo_fd);
             break;
         case FMT_TEXT: 
         case FMT_CSV:
