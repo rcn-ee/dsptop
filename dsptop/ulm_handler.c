@@ -42,6 +42,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <math.h>
+#include <string.h>
 
 #include "dsptop.h"
 #include "etb_handler.h"
@@ -104,6 +105,13 @@ static int const max_num_dsps = 8;
 bool run_time_flag[] = {0,0,0,0,0,0,0,0};
 bool idle_time_flag[] = {0,0,0,0,0,0,0,0};
 bool exit_flag[] = {0,0,0,0,0,0,0,0};
+#if defined(DRA7xx)
+bool suspend_flipped[] = {false,false,false,false,false,false,false,false};
+char *power_control_file[] = {
+        "/sys/bus/platform/devices/40800000.dsp/power/control",
+        "/sys/bus/platform/devices/41000000.dsp/power/control",
+        NULL,NULL,NULL,NULL,NULL,NULL};
+#endif
 
 static double plot_runtime[] = {0,0,0,0,0,0,0,0};
 static double plot_idletime[] = {0,0,0,0,0,0,0,0};
@@ -268,6 +276,22 @@ void ulm_init(options_t * options_p, dsp_type_t * dsp_p, dsp_usage_info_t * dsp_
     plot_usage_enable = ((options_p->out_filename_p != NULL) && (options_p->logging_enable == false)) ? true : false;
     ulm_plot_clear();
 
+#if defined(DRA7xx)
+    /* DRA7xx might have power control, set DSP to "on" if suspended */
+    FILE *fp = NULL;
+    char status[8];
+    for (int i = 0; i < config_num_dsps; i++) {
+        if (power_control_file[i] == NULL)  continue;
+        if ((fp = fopen(power_control_file[i], "r+")) == NULL) continue;
+        if (fread(status, 1, 2, fp) < 2)  continue;
+        if (strncmp(status, "on", 2) == 0)  continue;
+        fseek(fp, 0L, SEEK_SET);
+        fwrite("on", 1, 2, fp);
+        fclose(fp);
+        suspend_flipped[i] = true;
+        LOGMSG("DSP%d: power control flipped to on", i+1);
+    }
+#endif
 }
 
 /***************************************************************************** 
@@ -283,6 +307,20 @@ void ulm_close()
         etb_term();
         ulm_term();
         sys_resources_configured = false;
+
+#if defined(DRA7xx)
+        /* DRA7xx might have power control, set DSP to "auto" if flipped */
+        FILE *fp = NULL;
+        for (int i = 0; i < config_num_dsps; i++) {
+            if (   suspend_flipped[i] == false
+                || power_control_file[i] == NULL)  continue;
+            if ((fp = fopen(power_control_file[i], "w")) == NULL) continue;
+            fwrite("auto", 1, 4, fp);
+            fclose(fp);
+            suspend_flipped[i] = false;
+            LOGMSG("DSP%d: power control flipped back to auto", i+1);
+        }
+#endif
     }
 
 }
