@@ -3,7 +3,7 @@
  *
  * dsptop Implementation
  *
- * Copyright (C) 2014 Texas Instruments Incorporated - http://www.ti.com/ 
+ * Copyright (C) 2014-2016 Texas Instruments Incorporated - http://www.ti.com/ 
  * 
  * 
  *  Redistribution and use in source and binary forms, with or without 
@@ -40,7 +40,7 @@
 #define VERSION_H
 
 #define MAJOR_VERSION 1
-#define MINOR_VERSION 2
+#define MINOR_VERSION 4
 #define PATCH_VERSION 0
 
 

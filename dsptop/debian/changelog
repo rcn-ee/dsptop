@@ -1,3 +1,9 @@
+dsptop (1.4.0-0ubuntu0~ppa0) trusty; urgency=medium
+
+  * Added fifo mode for dsptop output.
+
+ -- TI Keystone PPA <ti-keystone-ppa@list.ti.com>  Thu, 15 Sep 2016 10:30:43 -0500
+
 dsptop (1.1.5-0ubuntu0~ppa5) trusty; urgency=high
 
   * Updated dsptop and ulm to unmap debug modules as part of task termination
